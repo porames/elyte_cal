@@ -540,7 +540,7 @@ export default function App() {
         {state === "" ? (
           <div>
             <Eyebrow tone="teal">Porames PocketMed Calculator</Eyebrow>
-            <h1 className="text-2xl font-semibold mb-1">Electrolyte Console</h1>
+            <h1 className="text-2xl font-semibold mb-1">Electrolyte Console <span className="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 inset-ring inset-ring-red-600/10">BETA</span></h1>
             <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
               Pick an electrolyte to see correction protocols for the value you enter.
             </p>
