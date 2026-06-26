@@ -48,7 +48,15 @@ function Tokens() {
    Primitive components
 --------------------------------------------------------- */
 
-function NumberInput({ label, value, onChange, placeholder, unit }) {
+interface NumberInputProps {
+  label: string;
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
+  placeholder?: string;
+  unit?: string;
+}
+
+function NumberInput({ label, value, onChange, placeholder, unit }: NumberInputProps) {
   return (
     <div className="flex items-center gap-4">
       <label className="w-44 text-sm font-medium" style={{ color: "var(--muted)" }}>{label}</label>
@@ -71,7 +79,13 @@ function NumberInput({ label, value, onChange, placeholder, unit }) {
   );
 }
 
-function InlineNumberInpupt({ value, onChange, placeholder }) {
+interface InlineNumberInpuptProps {
+  value: number | undefined;
+  onChange: (value: number | undefined) => void;
+  placeholder?: string;
+}
+
+function InlineNumberInpupt({ value, onChange, placeholder }: InlineNumberInpuptProps) {
   const width = Math.max(2, String(value ?? placeholder ?? "").length) + 1.5;
   return (
     <input
@@ -95,7 +109,7 @@ function InlineNumberInpupt({ value, onChange, placeholder }) {
   );
 }
 
-function WarningBox({ children }) {
+function WarningBox({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="flex items-start gap-3 p-3 rounded-lg"
@@ -107,8 +121,8 @@ function WarningBox({ children }) {
   );
 }
 
-function Eyebrow({ children, tone = "muted" }) {
-  const colors = {
+function Eyebrow({ children, tone = "muted" }: { children: React.ReactNode; tone?: "muted" | "teal" }) {
+  const colors: Record<"muted" | "teal", string> = {
     muted: "var(--muted)",
     teal: "var(--teal)",
   };
@@ -122,7 +136,15 @@ function Eyebrow({ children, tone = "muted" }) {
   );
 }
 
-function SectionCard({ eyebrow, title, children }) {
+function SectionCard({
+  eyebrow,
+  title,
+  children,
+}: {
+  eyebrow?: string;
+  title?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-xl p-4 bg-white" style={{ border: "1px solid var(--border)" }}>
       {eyebrow && <Eyebrow tone="teal">{eyebrow}</Eyebrow>}
@@ -134,8 +156,12 @@ function SectionCard({ eyebrow, title, children }) {
   );
 }
 
-function StatusPill({ status }) {
-  const map = {
+interface StatusPillProps {
+  status: { kind: "hypo" | "hyper" | "normal"; label: string };
+}
+
+function StatusPill({ status }: StatusPillProps) {
+  const map: Record<"hypo" | "hyper" | "normal", { bg: string; fg: string }> = {
     hypo: { bg: "var(--blue-soft)", fg: "var(--blue)" },
     hyper: { bg: "var(--red-soft)", fg: "var(--red)" },
     normal: { bg: "var(--green-soft)", fg: "var(--green)" },
@@ -152,13 +178,23 @@ function StatusPill({ status }) {
 }
 
 /* Reference-range bar, like a lab report */
-function RangeBar({ value, lnl, unl, unitLabel }) {
+function RangeBar({
+  value,
+  lnl,
+  unl,
+  unitLabel,
+}: {
+  value: number | undefined;
+  lnl: number;
+  unl: number;
+  unitLabel: string;
+}) {
   const range = unl - lnl;
   const domainMin = Math.max(0, lnl - range * 1.4);
   const domainMax = unl + range * 1.4;
-  const pct = (x) => Math.min(100, Math.max(0, ((x - domainMin) / (domainMax - domainMin)) * 100));
+  const pct = (x: number) => Math.min(100, Math.max(0, ((x - domainMin) / (domainMax - domainMin)) * 100));
   const hasValue = value !== undefined && !Number.isNaN(value) && value > 0;
-  const kind = !hasValue ? "normal" : value < lnl ? "hypo" : value > unl ? "hyper" : "normal";
+  const kind: "hypo" | "hyper" | "normal" = !hasValue ? "normal" : value! < lnl ? "hypo" : value! > unl ? "hyper" : "normal";
   const markerColor = { hypo: "var(--blue)", hyper: "var(--red)", normal: "var(--green)" }[kind];
 
   return (
@@ -191,7 +227,17 @@ function RangeBar({ value, lnl, unl, unitLabel }) {
 }
 
 /* Periodic-table style selector tile */
-function ElementTile({ symbol, name, range, unitLabel, color, disabled, onClick }) {
+interface ElementTileProps {
+  symbol: string;
+  name: string;
+  range: string;
+  unitLabel: string;
+  color: string;
+  disabled?: boolean;
+  onClick: () => void;
+}
+
+function ElementTile({ symbol, name, range, unitLabel, color, disabled, onClick }: ElementTileProps) {
   return (
     <button
       disabled={disabled}
@@ -211,13 +257,15 @@ function ElementTile({ symbol, name, range, unitLabel, color, disabled, onClick 
 /* ---------------------------------------------------------
    Potassium
 --------------------------------------------------------- */
-function Potassium({ value }) {
-  const [oralDrugMeq, setoralDrugMeq] = useState(8);
-  const [solDrugMeq, setSolDrugMeq] = useState(20);
-  const [solDrugMl, setSolDrugMl] = useState(15);
-  const [IVKConc, setIVKConc] = useState(60);
+function Potassium({ value }: { value: number }) {
+  const [oralDrugMeq, setoralDrugMeq] = useState<number | undefined>(8);
+  const [solDrugMeq, setSolDrugMeq] = useState<number | undefined>(20);
+  const [solDrugMl, setSolDrugMl] = useState<number | undefined>(15);
+  const [IVKConc, setIVKConc] = useState<number | undefined>(60);
+  const [centralIVKConc, setCentralIVKConc] = useState<number | undefined>(20);
+  const [KRate, setKRate] = useState<number | undefined>(10);
+  const [centralKRate, setCentralKRate] = useState<number | undefined>(20);
   const [isSevere, setIsSevere] = useState(false);
-  const [KRate, setKRate] = useState(10);
 
   useEffect(() => {
     if (value > 3 && value < 3.5) setKRate(4);
@@ -252,9 +300,27 @@ function Potassium({ value }) {
                   <li>→ <span className="mono">10% Calcium gluconate 10mL IV over 10 min</span></li>
                   <li>→ <span className="mono">Regular insulin 10u IV with 50% dextrose 50 mL</span></li>
                   <li>→ <span className="mono">Albuterol 20mg / 4mL in NSS NB in 10 min</span></li>
-                  <li>→ <span className="mono">7.5% NaHCO3 100mL IV</span></li>
+                  <li>
+                    → <span className="mono">7.5% NaHCO3 100mL IV</span>
+                    <span className="group relative inline-flex ml-1">
+                      <span className="flex items-center justify-center w-4 h-4 rounded-full bg-gray-400 text-white text-[10px] cursor-help">
+                        ?
+                      </span>
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white z-10">
+                        Consider when metablic acidosis pH &lt; 7.2
+                      </span>
+                    </span>
+                  </li>
                   <li>→ <span className="mono">Kalimate 30g PO</span></li>
                   <li>→ <span className="mono">Furosemide 40mg IV</span></li>
+                </ul>
+              </>
+            }
+            {(isSevere == false && value < 6.5) &&
+              <>
+                <p className="font-bold">Give K removal</p>
+                <ul>
+                  <li>→ <span className="mono">Kalimate 15g ผสมน้ำ 50m PO BID</span></li>
                 </ul>
               </>
             }
@@ -262,16 +328,16 @@ function Potassium({ value }) {
         </>
       )}
 
-      {value < 3.5 && value > 3 && oralDrugMeq > 0 && (
+      {value < 3.5 && value > 3 && Number(oralDrugMeq) > 0 && (
         <SectionCard eyebrow="Mild hypokalemia" title="K 40–80 mEq/day">
           <p className="font-medium">Oral tablet</p>
           <p>
             Concentration
-            <InlineNumberInpupt value={oralDrugMeq} onChange={setoralDrugMeq} placeholder="mEq" />
+            <InlineNumberInpupt value={Number(oralDrugMeq)} onChange={setoralDrugMeq} placeholder="mEq" />
             mEq / tablet
           </p>
           <p>
-            → <span className="mono">{Math.floor(40 / oralDrugMeq)}–{Math.floor(80 / oralDrugMeq)}</span> tablets per day
+            → <span className="mono">{Math.floor(40 / Number(oralDrugMeq))}–{Math.floor(80 / Number(oralDrugMeq))}</span> tablets per day
           </p>
           <div className="h-px my-2" style={{ background: "var(--border)" }} />
           <p className="font-medium">Oral solution</p>
@@ -283,20 +349,20 @@ function Potassium({ value }) {
             mL
           </p>
           <p>
-            → <span className="mono">{Math.floor(40 / solDrugMeq)}–{Math.floor(80 / solDrugMeq)}</span> doses of {solDrugMl} mL per day
+            → <span className="mono">{Math.floor(40 / Number(solDrugMeq))}–{Math.floor(80 / Number(solDrugMeq))}</span> doses of {solDrugMl} mL per day
           </p>
         </SectionCard>
       )}
 
-      {value <= 3 && value >= 2.5 && oralDrugMeq > 0 && (
+      {value <= 3 && value >= 2.5 && Number(oralDrugMeq) > 0 && (
         <SectionCard eyebrow="Moderate hypokalemia" title="K 120 mEq/day">
           <p className="font-medium">Oral tablet</p>
           <p>
             Concentration
-            <InlineNumberInpupt value={oralDrugMeq} onChange={setoralDrugMeq} placeholder="mEq" />
+            <InlineNumberInpupt value={Number(oralDrugMeq)} onChange={setoralDrugMeq} placeholder="mEq" />
             mEq / tablet
           </p>
-          <p>→ <span className="mono">{Math.floor(120 / oralDrugMeq)}</span> tablets per day</p>
+          <p>→ <span className="mono">{Math.floor(120 / Number(oralDrugMeq))}</span> tablets per day</p>
           <div className="h-px my-2" style={{ background: "var(--border)" }} />
           <p className="font-medium">Oral solution</p>
           <p>
@@ -306,13 +372,13 @@ function Potassium({ value }) {
             <InlineNumberInpupt value={solDrugMl} onChange={setSolDrugMl} placeholder="mL" />
             mL
           </p>
-          <p>→ <span className="mono">{Math.floor(120 / solDrugMeq)}</span> doses of {solDrugMl} mL per day</p>
+          <p>→ <span className="mono">{Math.floor(120 / Number(solDrugMeq))}</span> doses of {Number(solDrugMl)} mL per day</p>
           <div className="h-px my-2" style={{ background: "var(--border)" }} />
           <p className="font-medium">IV</p>
           <p>
             5%DN/2 1000 mL + KCl
             <InlineNumberInpupt value={IVKConc} onChange={setIVKConc} placeholder="mEq" />
-            mEq → rate <span className="mono">{Math.floor((KRate * 1000) / IVKConc)}</span> mL/h
+            mEq → rate <span className="mono">{Math.floor((Number(KRate) * 1000) / Number(IVKConc))}</span> mL/h
           </p>
           <p>
             K infusion rate =
@@ -321,6 +387,34 @@ function Potassium({ value }) {
           </p>
         </SectionCard>
       )}
+      {value < 2.5 &&
+        <SectionCard eyebrow="Severe hypokalemia">
+          <div className="h-px my-2" style={{ background: "var(--border)" }} />
+          <p className="font-medium">Peripheral IV (max rate 10 mEq/hr)</p>
+          <p>
+            5%DN/2 1000 mL + KCl
+            <InlineNumberInpupt value={IVKConc} onChange={setIVKConc} placeholder="mEq" />
+            mEq → rate <span className="mono">{Math.floor((Number(KRate) * 1000) / Number(IVKConc))}</span> mL/h
+          </p>
+          <p>
+            K infusion rate =
+            <InlineNumberInpupt value={KRate} onChange={setKRate} placeholder="" />
+            mEq/h
+          </p>
+          <div className="h-px my-2" style={{ background: "var(--border)" }} />
+          <p className="font-medium">Central line IV (max rate 20 mEq/hr)</p>
+          <p>
+            5%DN/2 100 mL + KCl
+            <InlineNumberInpupt value={centralIVKConc} onChange={setCentralIVKConc} placeholder="mEq" />
+            mEq → rate <span className="mono">{Math.floor((Number(centralKRate) * 100) / Number(centralIVKConc))}</span> mL/h
+          </p>
+          <p>
+            K infusion rate =
+            <InlineNumberInpupt value={centralKRate} onChange={setCentralKRate} placeholder="" />
+            mEq/h
+          </p>
+        </SectionCard>
+      }
 
       {value > 0 && KRate !== undefined && KRate >= 20 && (
         <WarningBox>IV K rate should not exceed 20 mmol/hr.</WarningBox>
@@ -335,10 +429,11 @@ function Potassium({ value }) {
 /* ---------------------------------------------------------
    Sodium
 --------------------------------------------------------- */
-function Sodium({ value }) {
-  const [patient_weight, setPatientWeight] = useState(undefined);
-  const [targetNa, setTargetNa] = useState(undefined);
-  const [isAcute, setIsAcute] = useState(null);
+function Sodium({ value }: { value: number }) {
+  const [targetNa, setTargetNa] = useState<number | undefined>(undefined);
+  const [patient_weight, setPatientWeight] = useState<number | undefined>(undefined);
+
+  const [isAcute, setIsAcute] = useState<boolean | null>(null);
 
   return (
     <div className="space-y-3">
@@ -385,6 +480,14 @@ function Sodium({ value }) {
               <p>IV 0.9% NaCl rate = <span className="mono">{Math.round((0.6 * patient_weight * 8 * 1000) / (154 * 24))}</span> mL/hr</p>
             </>
           )}
+          {isAcute == false &&
+            <>
+              <div className="h-px my-2" style={{ background: "var(--border)" }} />
+              <h3 className="text-base font-semibold mb-2">If high-risk ODS, Na correction goal: 4-6 mEq/L/day</h3>
+              <p>Sodium deficit = <span className="mono">{Math.round(0.6 * patient_weight * 4)}</span> mEq/day</p>
+              <p>IV 0.9% NaCl rate = <span className="mono">{Math.round((0.6 * patient_weight * 4 * 1000) / (154 * 24))}</span> mL/hr</p>
+            </>
+          }
         </SectionCard>
       )}
 
@@ -407,7 +510,8 @@ function Sodium({ value }) {
    App
 --------------------------------------------------------- */
 export default function App() {
-  const [state, setState] = useState("");
+  type Electrolyte = "" | "na" | "k" | "ca" | "mg";
+  const [state, setState] = useState<Electrolyte>("");
   const [value, setValue] = useState("");
 
   const database = {
@@ -418,7 +522,10 @@ export default function App() {
   };
 
   const numValue = Number(value);
-  let statusObj = { kind: "normal", label: "—" };
+  let statusObj: StatusPillProps["status"] = {
+    kind: "normal",
+    label: "—",
+  };
   if (value !== "" && state) {
     const d = database[state];
     if (numValue < d.lnl) statusObj = { kind: "hypo", label: d.hypo };
@@ -432,24 +539,25 @@ export default function App() {
       <div className="w-full max-w-md">
         {state === "" ? (
           <div>
-            <Eyebrow tone="teal">Bedside reference</Eyebrow>
+            <Eyebrow tone="teal">Porames PocketMed Calculator</Eyebrow>
             <h1 className="text-2xl font-semibold mb-1">Electrolyte Console</h1>
             <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>
               Pick an electrolyte to see correction protocols for the value you enter.
             </p>
             <div className="grid grid-cols-2 gap-3">
-              {Object.entries(database).map(([key, d]) => (
-                <ElementTile
-                  key={key}
-                  symbol={d.symbol}
-                  name={d.name}
-                  range={`${d.lnl}–${d.unl}`}
-                  unitLabel="mEq/L"
-                  color={d.color}
-                  disabled={key === "ca" || key === "mg"}
-                  onClick={() => setState(key)}
-                />
-              ))}
+              {(Object.entries(database) as [Exclude<Electrolyte, "">, typeof database["na"]][])
+                .map(([key, d]) => (
+                  <ElementTile
+                    key={key}
+                    symbol={d.symbol}
+                    name={d.name}
+                    range={`${d.lnl}–${d.unl}`}
+                    unitLabel="mEq/L"
+                    color={d.color}
+                    disabled={key === "ca" || key === "mg"}
+                    onClick={() => setState(key)}
+                  />
+                ))}
             </div>
           </div>
         ) : (
