@@ -1,4 +1,3 @@
-"use client"
 import React, { useEffect, useState } from "react";
 import { ChevronLeft, AlertTriangle, House } from "lucide-react";
 import Tokens from "./components/tokens"

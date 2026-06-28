@@ -1,4 +1,3 @@
-"use client"
 import React, { useState, useRef, useEffect, useMemo, ReactNode, Ref } from "react";
 import {
     ChevronDown,
